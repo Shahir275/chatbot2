@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Student Achievement Tracking System</title>
+  <style>
+    :root{
+      --bg:#0f1724; --card:#0b1220; --muted:#9aa7b2; --accent:#6EE7B7;
+      --glass: rgba(255,255,255,0.04);
+      --max-width:1100px;
+      --radius:12px;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    * { box-sizing: border-box; }
+    body{
+      margin:0; min-height:100vh; background:
+      radial-gradient(1200px 600px at 10% 10%, rgba(110,231,183,0.06), transparent),
+      linear-gradient(180deg, #071224 0%, #061018 100%);
+      color:#e6eef2; -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      display:flex; align-items:flex-start; justify-content:center;
+      padding:28px;
+    }
+    .container{
+      width:100%; max-width:var(--max-width); margin:0 auto;
+    }
+    header{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:16px; margin-bottom:22px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px;
+    }
+    .logo{
+      width:52px; height:52px; border-radius:10px; background:linear-gradient(135deg,var(--accent),#60A5FA);
+      display:flex;align-items:center;justify-content:center;color:#082028;font-weight:700;
+      box-shadow:0 6px 18px rgba(6,12,20,0.6);
+      font-size:18px;
+    }
+    h1{ margin:0; font-size:1.25rem; letter-spacing:0.2px }
+    nav{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    nav button{
+      background:transparent; border:0; color:var(--muted); padding:8px 12px; border-radius:10px;
+      cursor:pointer; transition: all .16s ease;
+    }
+    nav button.active{ color:#001F14; background:var(--accent); box-shadow:0 6px 18px rgba(16,185,129,0.12); }
+    main{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+      border-radius:var(--radius); padding:20px; box-shadow: 0 10px 40px rgba(2,6,23,0.6);
+      display:grid; grid-template-columns: 1fr; gap:16px;
+      backdrop-filter: blur(6px); border:1px solid rgba(255,255,255,0.03);
+    }
+
+    /* Layout columns on larger screens */
+    @media(min-width:900px){
+      main{ grid-template-columns: 360px 1fr; align-items:start; }
+    }
+
+    /* Card */
+    .card{ background:var(--card); border-radius:12px; padding:16px; }
+    .small{ font-size:0.9rem; color:var(--muted) }
+
+    /* Add form */
+    label{ display:block; font-size:0.85rem; margin-bottom:6px; color:var(--muted) }
+    input[type="text"], input[type="date"], input[type="number"], select, textarea{
+      width:100%; padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.03);
+      background:var(--glass); color:inherit; outline:none; font-size:0.95rem;
+    }
+    textarea{ min-height:100px; resize:vertical; }
+    .form-row{ margin-bottom:12px; }
+    .btn{
+      display:inline-block; padding:10px 14px; border-radius:10px; border:0; cursor:pointer;
+      background:linear-gradient(90deg,#34D399,#60A5FA); color:#00211b; font-weight:700;
+    }
+    .btn.ghost{ background:transparent; color:var(--muted); border:1px solid rgba(255,255,255,0.03); font-weight:600; }
+
+    /* List */
+    .toolbar{ display:flex; gap:8px; align-items:center; margin-bottom:12px; flex-wrap:wrap; }
+    .search{ flex:1; display:flex; gap:8px; }
+    .search input{ flex:1; }
+    table{ width:100%; border-collapse:collapse; font-size:0.95rem; }
+    th, td{ text-align:left; padding:10px 8px; border-bottom:1px dashed rgba(255,255,255,0.03); vertical-align:middle; }
+    th{ color:var(--muted); font-weight:600; font-size:0.85rem; }
+    .muted{ color:var(--muted); font-size:0.85rem; }
+    .actions button{ margin-right:6px; }
+
+    .img-thumb{ width:56px; height:40px; object-fit:cover; border-radius:6px; border:1px solid rgba(255,255,255,0.04); }
+
+    footer{ text-align:center; color:var(--muted); padding:12px 0; font-size:0.9rem; }
+
+    /* small screens adjustments */
+    @media(max-width:899px){
+      .logo{ width:44px;height:44px;font-size:16px }
+      main{ padding:14px }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo">SAT</div>
+        <div>
+          <h1>Student Achievement Tracking System</h1>
+          <div class="small">Home → Add Achievement → View Achievement List → About</div>
+        </div>
+      </div>
+
+      <nav aria-label="Main navigation">
+        <button class="nav-btn active" data-view="home">Home</button>
+        <button class="nav-btn" data-view="add">Add Achievement</button>
+        <button class="nav-btn" data-view="list">View Achievement List</button>
+        <button class="nav-btn" data-view="about">About</button>
+      </nav>
+    </header>
+
+    <main>
+      <!-- Left column: Add form summary or quick info -->
+      <section class="card" id="left-card">
+        <h3 style="margin-top:0">Quick Add</h3>
+        <p class="small">Use this quick form to add an achievement fast. For full details, go to <strong>Add Achievement</strong>.</p>
+
+        <form id="quick-add-form">
+          <div class="form-row">
+            <label for="q-title">Title</label>
+            <input id="q-title" type="text" placeholder="Achievement title" required>
+          </div>
+          <div style="display:flex; gap:8px;" class="form-row">
+            <div style="flex:1">
+              <label for="q-student">Student</label>
+              <input id="q-student" type="text" placeholder="Student name">
+            </div>
+            <div style="width:130px">
+              <label for="q-date">Date</label>
+              <input id="q-date" type="date">
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <button class="btn" type="submit">Add</button>
+            <button class="btn ghost" type="button" id="to-add-full">Open full form</button>
+          </div>
+        </form>
+
+        <hr style="border:none;height:1px;background:rgba(255,255,255,0.02); margin:14px 0;">
+        <div>
+          <div class="small">Stats</div>
+          <div style="display:flex;gap:12px;margin-top:10px;">
+            <div>
+              <div style="font-size:1.35rem;font-weight:700" id="stat-count">0</div>
+              <div class="small">Total achievements</div>
+            </div>
+            <div>
+              <div style="font-size:1.35rem;font-weight:700" id="stat-last">—</div>
+              <div class="small">Most recent</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right column: views -->
+      <section class="card" id="view-area" aria-live="polite">
+        <!-- Home view -->
+        <div class="view" id="view-home">
+          <h2 style="margin-top:0">Welcome</h2>
+          <p class="small">This system helps you record and track student achievements (awards, certifications, competitions, projects). Use the navigation above to add new achievements or review the list.</p>
+
+          <div style="display:flex; gap:12px; margin-top:18px; flex-wrap:wrap;">
+            <button class="btn" data-action="go-add">Add Achievement</button>
+            <button class="btn ghost" data-action="go-list">View Achievements</button>
+          </div>
+        </div>
+
+        <!-- Add Achievement view -->
+        <div class="view" id="view-add" style="display:none;">
+          <h2 style="margin-top:0">Add Achievement</h2>
+
+          <form id="achievement-form">
+            <div class="form-row">
+              <label for="title">Title *</label>
+              <input id="title" name="title" type="text" required placeholder="e.g., State Science Fair - 1st place">
+            </div>
+
+            <div class="form-row" style="display:flex; gap:10px;">
+              <div style="flex:1">
+                <label for="student">Student *</label>
+                <input id="student" name="student" type="text" required placeholder="Student full name">
+              </div>
+              <div style="width:170px;">
+                <label for="date">Date</label>
+                <input id="date" name="date" type="date">
+              </div>
+            </div>
+
+            <div class="form-row" style="display:flex; gap:10px;">
+              <div style="flex:1">
+                <label for="category">Category</label>
+                <select id="category" name="category">
+                  <option>Competition</option>
+                  <option>Certificate</option>
+                  <option>Project</option>
+                  <option>Sports</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div style="width:140px;">
+                <label for="score">Score / Rank</label>
+                <input id="score" name="score" type="text" placeholder="e.g., 1st, 95%">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label for="desc">Description</label>
+              <textarea id="desc" name="desc" placeholder="Short description or notes"></textarea>
+            </div>
+
+            <div class="form-row">
+              <label for="image">Optional image (photo / certificate)</label>
+              <input id="image" name="image" type="file" accept="image/*">
+            </div>
+
+            <div style="display:flex; gap:8px; align-items:center;">
+              <button class="btn" type="submit">Save Achievement</button>
+              <button class="btn ghost" type="button" id="cancel-edit" style="display:none">Cancel Edit</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- List view -->
+        <div class="view" id="view-list" style="display:none;">
+          <h2 style="margin-top:0">Achievement List</h2>
+
+          <div class="toolbar">
+            <div class="search">
+              <input id="search" placeholder="Search by title, student or category..." />
+              <select id="filter-category">
+                <option value="">All categories</option>
+                <option>Competition</option>
+                <option>Certificate</option>
+                <option>Project</option>
+                <option>Sports</option>
+                <option>Other</option>
+              </select>
+            </div>
+
+            <div style="display:flex; gap:8px; align-items:center;">
+              <select id="sort-by" title="Sort">
+                <option value="newest">Newest</option>
+                <option value="oldest">Oldest</option>
+                <option value="student">Student A→Z</option>
+                <option value="category">Category</option>
+              </select>
+              <button class="btn ghost" id="clear-all">Clear all</button>
+            </div>
+          </div>
+
+          <div style="overflow:auto; max-height:56vh;">
+            <table id="ach-table" aria-describedby="table-desc">
+              <thead>
+                <tr><th>Preview</th><th>Title</th><th>Student</th><th>Date</th><th>Category</th><th>Score</th><th class="muted">Actions</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+
+          <p id="table-desc" class="small muted" style="margin-top:12px">Use actions to edit or remove records.</p>
+        </div>
+
+        <!-- About view -->
+        <div class="view" id="view-about" style="display:none;">
+          <h2 style="margin-top:0">About</h2>
+          <p class="small">Student Achievement Tracking System (SAT) — a simple browser-based tool to log and review student achievements. Data is stored locally in your browser (no server required).</p>
+          <hr style="border:none;height:1px;background:rgba(255,255,255,0.02); margin:14px 0;">
+          <p class="small"><strong>How to use</strong></p>
+          <ul class="small" style="line-height:1.6">
+            <li>Add achievements with date, category and notes.</li>
+            <li>Upload an image (certificate photo) — stored in browser storage.</li>
+            <li>Use the search & filters in the list view to find entries.</li>
+            <li>Records live in your browser — export/backup is possible via copy/paste of JSON (not included by default).</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="small">Built for learning • No server — data saved in browser</div>
+    </footer>
+  </div>
+
+  <script>
+    // Basic client-side app using localStorage
+    const KEY = 'sat_achievements_v1';
+    const navBtns = document.querySelectorAll('.nav-btn');
+    const views = document.querySelectorAll('.view');
+
+    function setView(name){
+      views.forEach(v => v.style.display = v.id === 'view-' + name ? 'block' : 'none');
+      navBtns.forEach(b => b.classList.toggle('active', b.dataset.view === name));
+    }
+
+    // navigation
+    document.querySelectorAll('.nav-btn').forEach(b => {
+      b.addEventListener('click', () => setView(b.dataset.view));
+    });
+    document.querySelectorAll('[data-action="go-add"]').forEach(el => el.addEventListener('click', ()=> setView('add')));
+    document.querySelectorAll('[data-action="go-list"]').forEach(el => el.addEventListener('click', ()=> setView('list')));
+    document.getElementById('to-add-full').addEventListener('click', ()=> setView('add'));
+
+    // Storage helpers
+    function loadData(){
+      try{
+        const raw = localStorage.getItem(KEY) || '[]';
+        return JSON.parse(raw);
+      }catch(e){ return []; }
+    }
+    function saveData(list){
+      localStorage.setItem(KEY, JSON.stringify(list));
+      refreshStats();
+    }
+
+    // Stats
+    function refreshStats(){
+      const list = loadData();
+      document.getElementById('stat-count').textContent = list.length;
+      if(list.length) {
+        document.getElementById('stat-last').textContent = list.reduce((a,b) => a.date > b.date ? a : b).date || '—';
+      } else document.getElementById('stat-last').textContent = '—';
+    }
+
+    // Quick add form
+    document.getElementById('quick-add-form').addEventListener('submit', function(e){
+      e.preventDefault();
+      const t = document.getElementById('q-title').value.trim();
+      if(!t) return alert('Give a title');
+      const a = {
+        id: Date.now().toString(),
+        title: t,
+        student: document.getElementById('q-student').value.trim() || 'Unknown',
+        date: document.getElementById('q-date').value || new Date().toISOString().split('T')[0],
+        category: 'Other',
+        score: '',
+        desc: '',
+        image: null
+      };
+      const list = loadData(); list.unshift(a); saveData(list);
+      this.reset(); renderTable();
+      setView('list');
+    });
+
+    // Full form (add/edit)
+    const form = document.getElementById('achievement-form');
+    let editId = null;
+
+    form.addEventListener('submit', async function(e){
+      e.preventDefault();
+      const item = {
+        id: editId || Date.now().toString(),
+        title: document.getElementById('title').value.trim(),
+        student: document.getElementById('student').value.trim() || 'Unknown',
+        date: document.getElementById('date').value || new Date().toISOString().split('T')[0],
+        category: document.getElementById('category').value,
+        score: document.getElementById('score').value.trim(),
+        desc: document.getElementById('desc').value.trim(),
+        image: null
+      };
+
+      // handle image file if present (convert to data URL)
+      const fileInput = document.getElementById('image');
+      if(fileInput.files && fileInput.files[0]){
+        item.image = await fileToDataURL(fileInput.files[0]);
+      } else if(editId){
+        // if editing and no new image, preserve existing image
+        const existing = loadData().find(x=>x.id===editId);
+        if(existing) item.image = existing.image || null;
+      }
+
+      let list = loadData();
+      if(editId){
+        list = list.map(x => x.id === editId ? item : x);
+      } else {
+        list.unshift(item);
+      }
+      saveData(list);
+      form.reset();
+      editId = null;
+      document.getElementById('cancel-edit').style.display = 'none';
+      renderTable();
+      setView('list');
+    });
+
+    document.getElementById('cancel-edit').addEventListener('click', () => {
+      editId = null; form.reset(); document.getElementById('cancel-edit').style.display = 'none';
+    });
+
+    function fileToDataURL(file){
+      return new Promise((res, rej) => {
+        const reader = new FileReader();
+        reader.onload = e => res(e.target.result);
+        reader.onerror = rej;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Render table
+    function renderTable(){
+      const tbody = document.querySelector('#ach-table tbody');
+      tbody.innerHTML = '';
+      const list = filterAndSort(loadData());
+      if(list.length === 0){
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td colspan="7" class="muted">No achievements yet. Add one!</td>`;
+        tbody.appendChild(tr);
+        refreshStats();
+        return;
+      }
+      list.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${item.image ? `<img src="${item.image}" alt="" class="img-thumb">` : '<div class="muted">—</div>'}</td>
+          <td><strong>${escapeHtml(item.title)}</strong><div class="small muted" style="margin-top:6px">${escapeHtml(item.desc || '')}</div></td>
+          <td>${escapeHtml(item.student)}</td>
+          <td class="muted">${escapeHtml(item.date || '')}</td>
+          <td class="muted">${escapeHtml(item.category || '')}</td>
+          <td>${escapeHtml(item.score || '')}</td>
+          <td class="actions">
+            <button class="btn ghost" data-edit="${item.id}">Edit</button>
+            <button class="btn ghost" data-delete="${item.id}">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // attach action listeners
+      tbody.querySelectorAll('[data-edit]').forEach(btn => {
+        btn.addEventListener('click', () => startEdit(btn.dataset.edit));
+      });
+      tbody.querySelectorAll('[data-delete]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if(!confirm('Delete this achievement?')) return;
+          let list = loadData().filter(x => x.id !== btn.dataset.delete);
+          saveData(list);
+          renderTable();
+        });
+      });
+
+      refreshStats();
+    }
+
+    // Edit flow
+    function startEdit(id){
+      const list = loadData();
+      const item = list.find(x => x.id === id);
+      if(!item) return alert('Item not found');
+      editId = id;
+      document.getElementById('title').value = item.title;
+      document.getElementById('student').value = item.student;
+      document.getElementById('date').value = item.date;
+      document.getElementById('category').value = item.category || 'Other';
+      document.getElementById('score').value = item.score || '';
+      document.getElementById('desc').value = item.desc || '';
+      document.getElementById('cancel-edit').style.display = 'inline-block';
+      setView('add');
+    }
+
+    // Helpers: escape HTML to avoid injection in inserted strings
+    function escapeHtml(s){
+      if(!s && s !== 0) return '';
+      return String(s).replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]; });
+    }
+
+    // Search / filter / sort
+    function filterAndSort(list){
+      const q = (document.getElementById('search')?.value || '').trim().toLowerCase();
+      const category = document.getElementById('filter-category')?.value || '';
+      let out = list.slice();
+
+      if(q){
+        out = out.filter(it => (it.title+ ' ' + it.student + ' ' + (it.category||'') + ' ' + (it.desc||'')).toLowerCase().includes(q));
+      }
+      if(category){
+        out = out.filter(it => it.category === category);
+      }
+
+      const sort = document.getElementById('sort-by')?.value || 'newest';
+      out.sort((a,b) => {
+        if(sort === 'newest') return (b.id - a.id);
+        if(sort === 'oldest') return (a.id - b.id);
+        if(sort === 'student') return (a.student || '').localeCompare(b.student || '');
+        if(sort === 'category') return (a.category || '').localeCompare(b.category || '');
+        return 0;
+      });
+      return out;
+    }
+
+    // wire filters
+    ['search','filter-category','sort-by'].forEach(id=>{
+      const el = document.getElementById(id);
+      if(el) el.addEventListener('input', () => renderTable());
+    });
+
+    // Clear all
+    document.getElementById('clear-all').addEventListener('click', ()=> {
+      if(!confirm('Remove all achievements permanently?')) return;
+      localStorage.removeItem(KEY);
+      renderTable(); refreshStats();
+    });
+
+    // initial render
+    (function init(){
+      // populate with empty list if needed
+      if(!localStorage.getItem(KEY)) saveData([]);
+      renderTable();
+      refreshStats();
+      // show Home initially
+      setView('home');
+    })();
+
+    // small helper: export/import (optional)
+    // You can add export/import UI later; this sample keeps the code focused on add/list/edit/delete.
+  </script>
+</body>
+</html>
